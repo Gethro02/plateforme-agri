@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { getPrixParUnite, formatFourchette } from "../../utils/dataHelpers";
+import { usePrixStore } from "../../store/usePrixStore";
 
 export default function ProduitCarte({ produit }) {
-  const prixParUnite = getPrixParUnite(produit.id);
+  const { prix } = usePrixStore();
+  const prixParUnite = getPrixParUnite(prix, produit.id);
   const uniteParDefaut = prixParUnite.find((p) => p.unite.uniteParDefaut);
   const aDesPrix = uniteParDefaut && uniteParDefaut.releves.length > 0;
 
@@ -29,10 +31,7 @@ export default function ProduitCarte({ produit }) {
             Prix indicatif (1 {uniteParDefaut.unite.symbole})
           </p>
           <p className="font-bold text-green-700">
-            {formatFourchette(
-              uniteParDefaut.prixMin,
-              uniteParDefaut.prixMax
-            )}
+            {formatFourchette(uniteParDefaut.prixMin, uniteParDefaut.prixMax)}
           </p>
         </div>
       ) : (

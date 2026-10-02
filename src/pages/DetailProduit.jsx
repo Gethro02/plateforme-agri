@@ -1,9 +1,11 @@
 import { useParams, Link } from "react-router-dom";
 import { produits, marches } from "../data";
 import { getPrixParUnite, formatFourchette } from "../utils/dataHelpers";
+import { usePrixStore } from "../store/usePrixStore";
 
 export default function DetailProduit() {
   const { id } = useParams();
+  const { prix } = usePrixStore();
   const produit = produits.find((p) => p.id === Number(id));
 
   if (!produit) {
@@ -17,7 +19,7 @@ export default function DetailProduit() {
     );
   }
 
-  const prixParUnite = getPrixParUnite(produit.id);
+  const prixParUnite = getPrixParUnite(prix, produit.id);
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -41,7 +43,9 @@ export default function DetailProduit() {
         </h2>
 
         {prixParUnite.length === 0 ? (
-          <p className="text-gray-500 italic">Aucun prix relevé pour ce produit.</p>
+          <p className="text-gray-500 italic">
+            Aucun prix relevé pour ce produit.
+          </p>
         ) : (
           <div className="bg-white rounded-lg shadow divide-y">
             {prixParUnite.map((item) => {
@@ -90,6 +94,7 @@ export default function DetailProduit() {
                 <th className="text-left px-4 py-2">Unité</th>
                 <th className="text-right px-4 py-2">Prix</th>
                 <th className="text-left px-4 py-2">Date</th>
+                <th className="text-center px-4 py-2">Statut</th>
               </tr>
             </thead>
             <tbody>
@@ -97,11 +102,11 @@ export default function DetailProduit() {
                 item.releves.map((releve) => {
                   const marche = marches.find((m) => m.id === releve.marcheId);
                   return (
-                    <tr key={releve.id} className="border-t">
-                      <td className="px-4 py-2">{marche ? marche.nom : "—"}</td>
+                    <tr key={releve.id} className="border-t hover:bg-gray-50">
                       <td className="px-4 py-2">
-                        {releve.prixParUnite && `1 ${item.unite.symbole}`}
+                        {marche ? marche.nom : "—"}
                       </td>
+                      <td className="px-4 py-2">1 {item.unite.symbole}</td>
                       <td className="px-4 py-2 text-right font-medium">
                         {new Intl.NumberFormat("fr-FR").format(
                           releve.prixParUnite
@@ -110,6 +115,17 @@ export default function DetailProduit() {
                       </td>
                       <td className="px-4 py-2 text-gray-500">
                         {new Date(releve.dateReleve).toLocaleDateString("fr-FR")}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {releve.estVerifie ? (
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                            ✓
+                          </span>
+                        ) : (
+                          <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                            …
+                          </span>
+                        )}
                       </td>
                     </tr>
                   );

@@ -45,15 +45,18 @@ export function getUnitesDuProduit(produitId) {
 }
 
 // Obtenir tous les prix d'un produit pour un marché donné
-export function getPrixDuProduit(produitId, marcheId = null) {
-  return prix.filter(
-    (p) => p.produitId === produitId && (marcheId ? p.marcheId === marcheId : true)
+// `listePrix` est passé en paramètre (au lieu d'être importé)
+export function getPrixDuProduit(listePrix, produitId, marcheId = null) {
+  return listePrix.filter(
+    (p) =>
+      p.produitId === produitId &&
+      (marcheId ? p.marcheId === marcheId : true)
   );
 }
 
 // Obtenir les prix d'un produit groupés par unité
-export function getPrixParUnite(produitId, marcheId = null) {
-  const prixProduit = getPrixDuProduit(produitId, marcheId);
+export function getPrixParUnite(listePrix, produitId, marcheId = null) {
+  const prixProduit = getPrixDuProduit(listePrix, produitId, marcheId);
   const unitesProduit = getUnitesDuProduit(produitId);
 
   return unitesProduit.map((unite) => {
@@ -61,8 +64,12 @@ export function getPrixParUnite(produitId, marcheId = null) {
     return {
       unite,
       releves,
-      prixMin: releves.length ? Math.min(...releves.map((r) => r.prixParUnite)) : null,
-      prixMax: releves.length ? Math.max(...releves.map((r) => r.prixParUnite)) : null,
+      prixMin: releves.length
+        ? Math.min(...releves.map((r) => r.prixParUnite))
+        : null,
+      prixMax: releves.length
+        ? Math.max(...releves.map((r) => r.prixParUnite))
+        : null,
     };
   });
 }
