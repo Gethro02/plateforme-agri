@@ -6,6 +6,7 @@ const liens = [
   { to: "/producteurs", label: "Producteurs" },
   { to: "/acheteurs", label: "Acheteurs" },
   { to: "/offres", label: "Offres" },
+  { to: "/saisie-prix", label: "Saisie prix" },
 ];
 
 export default function Header() {
