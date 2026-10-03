@@ -4,7 +4,9 @@ import { useEffect } from "react";
 
 const liens = [
   { to: "/", label: "Accueil" },
+  { to: "/statistiques", label: "Statistiques" },
   { to: "/produits", label: "Produits" },
+  
   { to: "/comparateur", label: "Comparateur" },
   { to: "/producteurs", label: "Producteurs" },
   { to: "/acheteurs", label: "Acheteurs" },

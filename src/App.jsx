@@ -12,6 +12,7 @@ import APropos from "./pages/APropos";
 import Contact from "./pages/Contact";
 import Page404 from "./pages/Page404";
 import ProfilActeur from "./pages/ProfilActeur";
+import Statistiques from "./pages/Statistiques";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/a-propos" element={<APropos />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/acteurs/:id" element={<ProfilActeur />} />
+          <Route path="/statistiques" element={<Statistiques />} />
           {/* Route 404 : doit rester en dernière position */}
           <Route path="*" element={<Page404 />} />
         </Route>
