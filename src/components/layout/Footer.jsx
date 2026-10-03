@@ -2,9 +2,8 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-800 text-gray-300 mt-12">
+    <footer className="bg-gray-800 dark:bg-black text-gray-300 mt-12">
       <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Colonne 1 : Présentation */}
         <div>
           <h3 className="text-white font-bold mb-3">
             🌾 Plateforme Agricole
@@ -18,7 +17,6 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* Colonne 2 : Navigation */}
         <div>
           <h3 className="text-white font-bold mb-3">Navigation</h3>
           <ul className="space-y-2 text-sm">
@@ -45,7 +43,6 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Colonne 3 : Informations */}
         <div>
           <h3 className="text-white font-bold mb-3">Informations</h3>
           <ul className="space-y-2 text-sm">

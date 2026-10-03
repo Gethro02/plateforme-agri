@@ -9,7 +9,7 @@ export default function BadgeFraicheur({ date, afficherDate = false }) {
         {texte}
       </span>
       {afficherDate && date && (
-        <span className="text-gray-400">
+        <span className="text-gray-400 dark:text-gray-500">
           ({new Date(date).toLocaleDateString("fr-FR")})
         </span>
       )}
