@@ -4,6 +4,7 @@ import {
   regions,
   acteurs,
 } from "../../data";
+import BadgeFraicheur from "../ui/BadgeFraicheur";
 
 const labelParType = {
   VEN: { texte: "VEN", couleur: "bg-green-100 text-green-800" },
@@ -65,10 +66,9 @@ export default function OffreCarte({ offre, onMarquerPourvue }) {
         <p>
           👤 {acteur.nom}
         </p>
-        <p className="text-xs text-gray-400">
-          Publié le{" "}
-          {new Date(offre.datePublication).toLocaleDateString("fr-FR")}
-        </p>
+        <div className="mt-1">
+            <BadgeFraicheur date={offre.datePublication} />
+        </div>
       </div>
 
       {/* Boutons */}

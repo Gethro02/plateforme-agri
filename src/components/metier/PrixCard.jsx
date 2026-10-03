@@ -1,11 +1,11 @@
 import { formatFourchette } from "../../utils/dataHelpers";
+import BadgeFraicheur from "../ui/BadgeFraicheur";
 
 export default function PrixCard({ produit, prixParUnite, marche, dateReleve }) {
   if (!produit) return null;
 
   return (
     <div className="bg-white rounded-lg shadow-md p-5 border-l-4 border-green-600">
-      {/* En-tête : nom du produit */}
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="text-lg font-bold text-gray-800">
@@ -21,7 +21,6 @@ export default function PrixCard({ produit, prixParUnite, marche, dateReleve }) 
         </span>
       </div>
 
-      {/* Liste des prix par unité */}
       <div className="space-y-3">
         {prixParUnite.map((item) => {
           const { unite, prixMin, prixMax, releves } = item;
@@ -29,16 +28,21 @@ export default function PrixCard({ produit, prixParUnite, marche, dateReleve }) 
 
           if (!releves.length) return null;
 
+          // Relevé le plus récent pour cette unité
+          const plusRecent = [...releves].sort(
+            (a, b) => new Date(b.dateReleve) - new Date(a.dateReleve)
+          )[0];
+
           return (
             <div
               key={unite.id}
-              className={`flex items-center justify-between p-3 rounded ${
+              className={`p-3 rounded ${
                 estParDefaut
                   ? "bg-green-50 border border-green-200"
                   : "bg-gray-50"
               }`}
             >
-              <div className="flex flex-col">
+              <div className="flex items-center justify-between mb-1">
                 <span className="font-medium text-gray-800">
                   {estParDefaut && "★ "}1 {unite.symbole}
                   {unite.equivalenceKg && (
@@ -47,22 +51,25 @@ export default function PrixCard({ produit, prixParUnite, marche, dateReleve }) 
                     </span>
                   )}
                 </span>
+                <span className="font-bold text-green-700">
+                  {formatFourchette(prixMin, prixMax)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">
                   {releves.length} relevé{releves.length > 1 ? "s" : ""}
                 </span>
+                <BadgeFraicheur date={plusRecent.dateReleve} />
               </div>
-              <span className="font-bold text-green-700">
-                {formatFourchette(prixMin, prixMax)}
-              </span>
             </div>
           );
         })}
       </div>
 
-      {/* Pied de carte : date du relevé */}
       {dateReleve && (
         <p className="text-xs text-gray-400 mt-4">
-          Dernier relevé : {new Date(dateReleve).toLocaleDateString("fr-FR")}
+          Dernier relevé global :{" "}
+          {new Date(dateReleve).toLocaleDateString("fr-FR")}
         </p>
       )}
     </div>

@@ -1,4 +1,5 @@
 import { produits, unites, marches } from "../../data";
+import BadgeFraicheur from "../ui/BadgeFraicheur";
 
 export default function TableauPrix({ prix, onVerifier, onSupprimer }) {
   if (!prix.length) {
@@ -49,8 +50,8 @@ export default function TableauPrix({ prix, onVerifier, onSupprimer }) {
                   {marche ? marche.nom : "—"}
                 </td>
                 <td className="px-4 py-2 text-gray-600">{p.source}</td>
-                <td className="px-4 py-2 text-gray-500">
-                  {new Date(p.dateReleve).toLocaleDateString("fr-FR")}
+                <td className="px-4 py-2">
+                    <BadgeFraicheur date={p.dateReleve} afficherDate={true} />
                 </td>
                 <td className="px-4 py-2 text-center">
                   {p.estVerifie ? (
