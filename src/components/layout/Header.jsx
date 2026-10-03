@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 const liens = [
   { to: "/", label: "Accueil" },
   { to: "/produits", label: "Produits" },
+  { to: "/comparateur", label: "Comparateur" },
   { to: "/producteurs", label: "Producteurs" },
   { to: "/acheteurs", label: "Acheteurs" },
   { to: "/offres", label: "Offres" },

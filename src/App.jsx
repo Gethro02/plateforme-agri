@@ -7,6 +7,7 @@ import Producteurs from "./pages/Producteurs";
 import Acheteurs from "./pages/Acheteurs";
 import Offres from "./pages/Offres";
 import SaisiePrix from "./pages/SaisiePrix";
+import Comparateur from "./pages/Comparateur";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/acheteurs" element={<Acheteurs />} />
           <Route path="/offres" element={<Offres />} />
           <Route path="/saisie-prix" element={<SaisiePrix />} />
+          <Route path="/comparateur" element={<Comparateur />} />
         </Route>
       </Routes>
     </BrowserRouter>
