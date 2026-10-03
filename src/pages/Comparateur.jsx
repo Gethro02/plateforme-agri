@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { produits, marches, unites } from "../data";
+import { produits, marches } from "../data";
 import { getPrixParUnite, formatPrix } from "../utils/dataHelpers";
 import { usePrixStore } from "../store/usePrixStore";
 import BadgeFraicheur from "../components/ui/BadgeFraicheur";
@@ -8,40 +8,54 @@ import BadgeFraicheur from "../components/ui/BadgeFraicheur";
 export default function Comparateur() {
   const { prix } = usePrixStore();
   const [produitId, setProduitId] = useState(produits[0].id);
+  const [mode, setMode] = useState("vendeur"); // "vendeur" | "acheteur"
 
   const produit = produits.find((p) => p.id === Number(produitId));
   const unitesDuProduit = getPrixParUnite(prix, produit.id).filter(
     (item) => item.releves.length > 0
   );
 
-  // Construction du tableau : une ligne par marché
   const lignes = marches.map((marche) => {
     const prixParUnite = getPrixParUnite(prix, produit.id, marche.id);
     const aDesPrix = prixParUnite.some((p) => p.releves.length > 0);
-
     return { marche, prixParUnite, aDesPrix };
   });
 
   const marchesAvecPrix = lignes.filter((l) => l.aDesPrix);
-
-  // Trouver le marché avec l'unité par défaut la moins chère
   const uniteParDefaut = unitesDuProduit.find((u) => u.unite.uniteParDefaut);
+
+  // Trouver le meilleur marché selon le mode
   let meilleurMarche = null;
-  let prixMinGlobal = null;
+  let prixReference = null;
 
   if (uniteParDefaut) {
     marchesAvecPrix.forEach((ligne) => {
       const item = ligne.prixParUnite.find(
         (p) => p.unite.id === uniteParDefaut.unite.id
       );
-      if (item && item.prixMin != null) {
-        if (prixMinGlobal === null || item.prixMin < prixMinGlobal) {
-          prixMinGlobal = item.prixMin;
-          meilleurMarche = ligne.marche;
-        }
+      if (!item || item.prixMin == null) return;
+
+      // Mode vendeur : on regarde le prix le plus élevé (prixMax)
+      // Mode acheteur : on regarde le prix le plus bas (prixMin)
+      const valeur =
+        mode === "vendeur" ? item.prixMax : item.prixMin;
+
+      if (
+        prixReference === null ||
+        (mode === "vendeur" && valeur > prixReference) ||
+        (mode === "acheteur" && valeur < prixReference)
+      ) {
+        prixReference = valeur;
+        meilleurMarche = ligne.marche;
       }
     });
   }
+
+  // Couleur de la recommandation selon le mode
+  const couleurReco =
+    mode === "vendeur"
+      ? { fond: "bg-blue-50", bord: "border-blue-600", texte: "text-blue-900", accent: "text-blue-800" }
+      : { fond: "bg-green-50", bord: "border-green-600", texte: "text-green-900", accent: "text-green-800" };
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -54,33 +68,70 @@ export default function Comparateur() {
         </p>
       </header>
 
-      {/* Sélection du produit */}
+      {/* Sélection du produit + mode */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Choisir un produit
-        </label>
-        <select
-          value={produitId}
-          onChange={(e) => setProduitId(e.target.value)}
-          className="w-full md:w-96 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-        >
-          {produits.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.nom} {p.variete}
-            </option>
-          ))}
-        </select>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Choisir un produit
+            </label>
+            <select
+              value={produitId}
+              onChange={(e) => setProduitId(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              {produits.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.nom} {p.variete}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Je suis…
+            </label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setMode("vendeur")}
+                className={`flex-1 py-2 rounded-lg font-medium transition ${
+                  mode === "vendeur"
+                    ? "bg-blue-700 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-blue-50"
+                }`}
+              >
+                🌱 Je vends
+              </button>
+              <button
+                onClick={() => setMode("acheteur")}
+                className={`flex-1 py-2 rounded-lg font-medium transition ${
+                  mode === "acheteur"
+                    ? "bg-green-700 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-green-50"
+                }`}
+              >
+                🛒 J'achète
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Recommandation */}
-      {meilleurMarche && prixMinGlobal && uniteParDefaut && (
-        <div className="bg-green-50 border-l-4 border-green-600 rounded p-4 mb-6">
-          <p className="text-sm font-medium text-green-800 mb-1">
-            💡 Meilleur marché pour vendre
+      {meilleurMarche && prixReference && uniteParDefaut && (
+        <div
+          className={`${couleurReco.fond} border-l-4 ${couleurReco.bord} rounded p-4 mb-6`}
+        >
+          <p className={`text-sm font-medium ${couleurReco.accent} mb-1`}>
+            {mode === "vendeur"
+              ? "💡 Marché le plus intéressant pour vendre"
+              : "💡 Marché le plus intéressant pour acheter"}
           </p>
-          <p className="text-green-900">
-            <strong>{meilleurMarche.nom}</strong> — prix le plus bas constaté à{" "}
-            <strong>{formatPrix(prixMinGlobal)}</strong> /{" "}
+          <p className={couleurReco.texte}>
+            <strong>{meilleurMarche.nom}</strong> — prix{" "}
+            {mode === "vendeur" ? "le plus élevé" : "le plus bas"} constaté à{" "}
+            <strong>{formatPrix(prixReference)}</strong> /{" "}
             {uniteParDefaut.unite.symbole}
           </p>
         </div>
@@ -98,10 +149,7 @@ export default function Comparateur() {
               <tr>
                 <th className="text-left px-4 py-3">Marché</th>
                 {unitesDuProduit.map((item) => (
-                  <th
-                    key={item.unite.id}
-                    className="text-right px-4 py-3"
-                  >
+                  <th key={item.unite.id} className="text-right px-4 py-3">
                     {item.unite.uniteParDefaut && "★ "}1 {item.unite.symbole}
                   </th>
                 ))}
@@ -112,7 +160,6 @@ export default function Comparateur() {
               {lignes.map((ligne) => {
                 if (!ligne.aDesPrix) return null;
 
-                // Relevé le plus récent pour ce marché
                 const tousReleves = ligne.prixParUnite.flatMap(
                   (p) => p.releves
                 );
@@ -123,18 +170,22 @@ export default function Comparateur() {
 
                 const estMeilleur =
                   meilleurMarche && ligne.marche.id === meilleurMarche.id;
+                const fondMeilleur =
+                  mode === "vendeur" ? "bg-blue-50" : "bg-green-50";
+                const couleurEtoile =
+                  mode === "vendeur" ? "text-blue-700" : "text-green-700";
 
                 return (
                   <tr
                     key={ligne.marche.id}
                     className={`border-t ${
-                      estMeilleur ? "bg-green-50" : "hover:bg-gray-50"
+                      estMeilleur ? fondMeilleur : "hover:bg-gray-50"
                     }`}
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         {estMeilleur && (
-                          <span className="text-green-700 font-bold">★</span>
+                          <span className={`font-bold ${couleurEtoile}`}>★</span>
                         )}
                         <div>
                           <p className="font-medium text-gray-800">
@@ -183,7 +234,6 @@ export default function Comparateur() {
         </div>
       )}
 
-      {/* Lien vers le détail */}
       <div className="mt-6 text-center">
         <Link
           to={`/produits/${produit.id}`}
