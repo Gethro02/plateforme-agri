@@ -5,6 +5,7 @@ import {
   acteurs,
 } from "../../data";
 import BadgeFraicheur from "../ui/BadgeFraicheur";
+import { Link } from "react-router-dom";
 
 const labelParType = {
   VEN: { texte: "VEN", couleur: "bg-green-100 text-green-800" },
@@ -64,8 +65,14 @@ export default function OffreCarte({ offre, onMarquerPourvue }) {
           📍 {region ? region.nom : "—"} · {acteur.ville}
         </p>
         <p>
-          👤 {acteur.nom}
-        </p>
+  👤{" "}
+  <Link
+    to={`/acteurs/${acteur.id}`}
+    className="text-green-700 hover:underline font-medium"
+  >
+    {acteur.nom}
+  </Link>
+</p>
         <div className="mt-1">
             <BadgeFraicheur date={offre.datePublication} />
         </div>

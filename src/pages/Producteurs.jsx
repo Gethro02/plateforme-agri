@@ -1,33 +1,35 @@
 import { useState } from "react";
-import { acteurs, regions } from "../data";
+import { Link } from "react-router-dom";
+import { regions } from "../data";
+import { useActeursStore } from "../store/useActeursStore";
 import ActeurCarte from "../components/metier/ActeurCarte";
+import FormulaireActeur from "../components/metier/FormulaireActeur";
 
 const roles = [
   { value: "tous", label: "Tous" },
   { value: "producteur", label: "Producteurs" },
   { value: "transformateur", label: "Transformateurs" },
   { value: "acheteur", label: "Acheteurs" },
+  { value: "transporteur", label: "Transporteurs" },
 ];
 
 export default function Producteurs() {
+  const { acteurs, ajouterActeur } = useActeursStore();
   const [recherche, setRecherche] = useState("");
   const [roleActif, setRoleActif] = useState("tous");
   const [regionActive, setRegionActive] = useState("toutes");
+  const [formulaireOuvert, setFormulaireOuvert] = useState(false);
 
-  // Liste des régions présentes dans les acteurs
   const regionsDisponibles = regions.filter((r) =>
     acteurs.some((a) => a.regionId === r.id)
   );
 
-  // Filtrage
   const acteursFiltres = acteurs
     .filter((a) => a.actif)
     .filter((a) => {
       if (roleActif !== "tous" && a.role !== roleActif) return false;
-
       if (regionActive !== "toutes" && a.regionId !== Number(regionActive))
         return false;
-
       if (recherche) {
         const r = recherche.toLowerCase();
         return (
@@ -35,24 +37,42 @@ export default function Producteurs() {
           a.ville.toLowerCase().includes(r)
         );
       }
-
       return true;
     });
 
+  const handleAjouter = (acteur) => {
+    ajouterActeur(acteur);
+    setFormulaireOuvert(false);
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold text-green-800 mb-2">
-          👥 Annuaire des acteurs
-        </h1>
-        <p className="text-gray-600">
-          {acteursFiltres.length} acteur
-          {acteursFiltres.length > 1 ? "s" : ""} trouvé
-          {acteursFiltres.length > 1 ? "s" : ""}
-        </p>
+      <header className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-green-800 mb-2">
+            👥 Annuaire des acteurs
+          </h1>
+          <p className="text-gray-600">
+            {acteursFiltres.length} acteur
+            {acteursFiltres.length > 1 ? "s" : ""} trouvé
+            {acteursFiltres.length > 1 ? "s" : ""}
+          </p>
+        </div>
+        <button
+          onClick={() => setFormulaireOuvert(!formulaireOuvert)}
+          className="bg-purple-700 hover:bg-purple-800 text-white font-medium px-4 py-2 rounded transition"
+        >
+          {formulaireOuvert ? "Fermer" : "+ Nouveau profil"}
+        </button>
       </header>
 
-      {/* Recherche */}
+      {formulaireOuvert && (
+        <FormulaireActeur
+          onAjouter={handleAjouter}
+          onAnnuler={() => setFormulaireOuvert(false)}
+        />
+      )}
+
       <div className="mb-4">
         <input
           type="text"
@@ -63,7 +83,6 @@ export default function Producteurs() {
         />
       </div>
 
-      {/* Filtres par rôle */}
       <div className="flex flex-wrap gap-2 mb-4">
         {roles.map((role) => (
           <button
@@ -80,7 +99,6 @@ export default function Producteurs() {
         ))}
       </div>
 
-      {/* Filtres par région */}
       <div className="flex flex-wrap gap-2 mb-6">
         <button
           onClick={() => setRegionActive("toutes")}
@@ -107,7 +125,6 @@ export default function Producteurs() {
         ))}
       </div>
 
-      {/* Grille d'acteurs */}
       {acteursFiltres.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {acteursFiltres.map((acteur) => (
