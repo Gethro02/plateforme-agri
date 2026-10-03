@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import BoutonTheme from "../ui/BoutonTheme";
+import BoutonInstallation from "../ui/BoutonInstallation";
 
 const liens = [
   { to: "/", label: "Accueil" },
@@ -17,17 +18,20 @@ export default function Header() {
   const [menuOuvert, setMenuOuvert] = useState(false);
   const location = useLocation();
 
+  // Ferme le menu mobile à chaque changement de page
   useEffect(() => {
     setMenuOuvert(false);
   }, [location.pathname]);
 
   return (
-    <header className="bg-green-700 dark:bg-gray-900 text-white shadow-md sticky top-0 z-50">
+    <header className="bg-green-700 dark:bg-gray-900 text-white shadow-md sticky top-0 z-50 transition-colors">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+        {/* Logo */}
         <NavLink to="/" className="text-lg sm:text-xl font-bold">
           🌾 <span className="hidden sm:inline">Plateforme Agricole</span>
         </NavLink>
 
+        {/* Menu desktop */}
         <nav className="hidden lg:flex gap-6">
           {liens.map((lien) => (
             <NavLink
@@ -46,14 +50,24 @@ export default function Header() {
           ))}
         </nav>
 
+        {/* Boutons à droite */}
         <div className="flex items-center gap-1">
+          {/* Bouton d'installation PWA (masqué sur mobile) */}
+          <div className="hidden sm:block">
+            <BoutonInstallation />
+          </div>
+
+          {/* Bouton de thème clair/sombre */}
           <BoutonTheme />
+
+          {/* Bouton hamburger (mobile) */}
           <button
             onClick={() => setMenuOuvert(!menuOuvert)}
-            className="lg:hidden p-2 rounded hover:bg-green-800 transition"
-            aria-label="Ouvrir le menu"
+            className="lg:hidden p-2 rounded hover:bg-green-800 dark:hover:bg-gray-800 transition"
+            aria-label={menuOuvert ? "Fermer le menu" : "Ouvrir le menu"}
           >
             {menuOuvert ? (
+              // Icône X
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -68,6 +82,7 @@ export default function Header() {
                 />
               </svg>
             ) : (
+              // Icône hamburger
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -86,6 +101,7 @@ export default function Header() {
         </div>
       </div>
 
+      {/* Menu mobile déroulant */}
       {menuOuvert && (
         <nav className="lg:hidden bg-green-800 dark:bg-gray-800 border-t border-green-600 dark:border-gray-700">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-col gap-2">
@@ -104,6 +120,11 @@ export default function Header() {
                 {lien.label}
               </NavLink>
             ))}
+
+            {/* Bouton d'installation dans le menu mobile */}
+            <div className="sm:hidden pt-2 border-t border-green-600 dark:border-gray-700">
+              <BoutonInstallation />
+            </div>
           </div>
         </nav>
       )}
