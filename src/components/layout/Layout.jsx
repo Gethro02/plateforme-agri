@@ -1,16 +1,15 @@
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
+import Footer from "./Footer";
 
 export default function Layout() {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
       <Header />
-      <main className="pb-12">
+      <main className="flex-1">
         <Outlet />
       </main>
-      <footer className="bg-gray-800 text-gray-300 text-sm text-center py-4">
-        Plateforme Agricole Cameroun — Phase pilote Banganté · {new Date().getFullYear()}
-      </footer>
+      <Footer />
     </div>
   );
 }

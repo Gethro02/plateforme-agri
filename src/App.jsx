@@ -8,6 +8,9 @@ import Acheteurs from "./pages/Acheteurs";
 import Offres from "./pages/Offres";
 import SaisiePrix from "./pages/SaisiePrix";
 import Comparateur from "./pages/Comparateur";
+import APropos from "./pages/APropos";
+import Contact from "./pages/Contact";
+import Page404 from "./pages/Page404";
 
 function App() {
   return (
@@ -17,11 +20,15 @@ function App() {
           <Route path="/" element={<Accueil />} />
           <Route path="/produits" element={<Produits />} />
           <Route path="/produits/:id" element={<DetailProduit />} />
+          <Route path="/comparateur" element={<Comparateur />} />
           <Route path="/producteurs" element={<Producteurs />} />
           <Route path="/acheteurs" element={<Acheteurs />} />
           <Route path="/offres" element={<Offres />} />
           <Route path="/saisie-prix" element={<SaisiePrix />} />
-          <Route path="/comparateur" element={<Comparateur />} />
+          <Route path="/a-propos" element={<APropos />} />
+          <Route path="/contact" element={<Contact />} />
+          {/* Route 404 : doit rester en dernière position */}
+          <Route path="*" element={<Page404 />} />
         </Route>
       </Routes>
     </BrowserRouter>
